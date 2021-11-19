@@ -4,7 +4,7 @@ import pandas as pd
 import pytz
 import requests
 import numpy as np
-from streamlit_folium import folium_static
+
 
 import folium
 
