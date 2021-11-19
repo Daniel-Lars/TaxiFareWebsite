@@ -3,52 +3,35 @@ from datetime import datetime, date
 import pandas as pd
 import pytz
 import requests
+import numpy as np
+from streamlit_folium import folium_static
+
+import folium
+
+import os
+
+import pandas as pd
+
 '''
-# TaxiFareModel front
+# TaxiFareModel
 '''
 
-st.markdown('''
-Remember that there are several ways to output content into your web page...
-
-Either as with the title by just creating a string (or an f-string). Or as with this paragraph using the `st.` functions
-''')
-'''
-## Here we would like to add some controllers in order to ask the user to select the parameters of the ride
-
-1. Let's ask for:
-
-- date and time
-- pickup longitude
-- pickup latitude
-- dropoff longitude
-- dropoff latitude
-- passenger count
-'''
-'''
-## Once we have these, let's call our API in order to retrieve a prediction
-
-See ? No need to load a `model.joblib` file in this app, we do not even need to know anything about Data Science in order to retrieve a prediction...
-
-🤔 How could we call our API ? Off course... The `requests` package 💡
-'''
 # date parameter input
 
 today_date = date.today()
 now = datetime.now()
 
 d = st.date_input("Select your pick up date", today_date)
-st.write(d)
 # time parameter input
 
 t = st.time_input('Select your pick up time', now)
-#datetime.time(8, 45)
-# pick up and drop off input
-st.write(t)
 
-pickup_longitude = st.number_input('Enter your pickup longitude', 40.7614327)
-pickup_latitude = st.number_input('Enter your pickup latitude', -73.9798156)
-dropoff_longitude = st.number_input('Enter your dropoff longitude', 40.6413111)
-dropoff_latitude = st.number_input('Enter your dropoff latitude', -73.9797156)
+# pick up and drop off input
+
+pickup_longitude = st.number_input('Enter your pickup longitude', -73.13)
+pickup_latitude = st.number_input('Enter your pickup latitude', 40.76)
+dropoff_longitude = st.number_input('Enter your dropoff longitude', -73.13)
+dropoff_latitude = st.number_input('Enter your dropoff latitude', 40.64 )
 
 ### drop down box for passenger count
 
@@ -68,17 +51,7 @@ if url == 'https://taxifare.lewagon.ai/predict':
     st.markdown(
         'Maybe you want to use your own API for the prediction, not the one provided by Le Wagon...'
     )
-'''
 
-2. Let's build a dictionary containing the parameters for our API...
-
-
-3. Let's call our API using the `requests` package...
-
-4. Let's retrieve the prediction from the **JSON** returned by the API...
-
-## Finally, we can display the prediction to the user
-'''
 
 # request dictionary containing the request parameters
 
@@ -108,4 +81,28 @@ url = 'https://taxifare.lewagon.ai/predict'
 
 request = requests.get(url, params=params).json()
 request = request.get('prediction','no prediciton available')
-st.write(request)
+
+if st.button('Predict'):
+    st.write(round(request,2))
+
+else:
+    st.write('⬆️ Click me 🙌🏼🎈')
+
+
+# Map creation
+
+m = folium.Map(location=[40.78, -73.96], zoom_start=9)
+
+folium.Marker(
+    location=[pickup_latitude, pickup_longitude],
+    #popup=city.city,
+    icon=folium.Icon(color="red", icon="info-sign"),
+    ).add_to(m)
+
+folium.Marker(
+    location=[dropoff_latitude, dropoff_longitude],
+    #popup=city.city,
+    icon=folium.Icon(color="red", icon="info-sign"),
+    ).add_to(m)
+
+folium_static(m)
